@@ -18,6 +18,37 @@ _global_script_class_icons={
 config/name="moonwards-launcher"
 config/icon="res://icon.png"
 
+[display]
+
+window/size/width=768
+window/size/height=768
+window/size/resizable=false
+window/size/test_width=768
+window/size/test_height=768
+window/energy_saving/keep_screen_on=false
+window/stretch/mode="2d"
+window/stretch/aspect="expand"
+
+[node]
+
+name_num_separator=2
+
+[physics]
+
+2d/physics_engine="GodotPhysics"
+3d/physics_engine="Bullet"
+
 [rendering]
 
+quality/driver/driver_name="GLES2"
+quality/driver/fallback_to_gles2=true
+quality/intended_usage/framebuffer_allocation=0
+quality/intended_usage/framebuffer_allocation.mobile=0
+quality/2d/use_pixel_snap=true
+quality/shadows/filter_mode=0
+quality/reflections/texture_array_reflections=false
+quality/reflections/high_quality_ggx=false
+quality/subsurface_scattering/quality=0
+quality/voxel_cone_tracing/high_quality=false
+quality/depth/hdr=false
 environment/default_environment="res://default_env.tres"
