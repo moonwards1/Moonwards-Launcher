@@ -1,0 +1,70 @@
+###########
+## macOS ##
+###########
+# General
+.DS_Store*
+.AppleDouble
+.LSOverride
+Icon?
+# Thumbnails
+._*
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux temp files
+.fuse_hidden*
+# KDE directory preferences
+.directory
+# Linux trash
+.Trash-*
+# locks
+.nfs*
+
+# Windows thumbnail cache files
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+# Dump file
+*.stackdump
+# Folder config file
+[Dd]esktop.ini
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+# Windows shortcuts
+*.lnk
+
+# backups
+*.bak
+*.gho
+*.ori
+*.orig
+*.tmp
+*.rej
+*.blend?
+
+# logs
+*.log
+
+
+###########
+## Godot ##
+###########
+*/.import/
+*.translation
+*/_EXPORT/HTML5/*
+*/!_EXPORT/HTML5/.keep
+*/_EXPORT/Linux-X11/*
+*/!_EXPORT/Linux-X11/.keep
+*/_EXPORT/macOS/*
+*/!_EXPORT/macOS/.keep
+*/_EXPORT/Windows-Desktop/*
+*/!_EXPORT/Windows-Desktop/.keep
+*/.mono/
+
+
+# custom
+addons/KirstyEditorTools/
+_EXPORT/

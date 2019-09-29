@@ -1,0 +1,215 @@
+# Auto text: Let git handle line conversion for those file types not listed
+#    below or set to specific eol/type. You should read the documentation for
+#    git that relates dealing with global settings.
+# On Windows, users should have CRLF>>LF on push LF>>CRLF on pull, so make sure
+#    that git config core.autocrlf=true.
+# On Linux and macOS should be LF in both directions. You shouldn't need to do
+#    anything on these OS's, unless you have changed the default eol.
+* text=auto
+
+# Git files: setting these to LF should be ok. Make sure that you use an editor
+#    that doesn't change line endings. So NO notepad, use something like Atom.
+.gitattributes text eol=lf
+.gitignore text eol=lf
+.gitconfig text eol=lf
+
+# Declare files that will always have LF line endings on checkout.
+*.sh text eol=lf
+.editorconfig text eol=lf linguist-language=INI gitlab-language=ini
+*.md text eol=lf
+*.gd text eol=lf linguist-language=GDScript gitlab-language=gdscript
+*.tscn text eol=lf linguist-language=INI gitlab-language=ini
+*.tres text eol=lf linguist-language=INI gitlab-language=ini
+*.flags text eol=lf linguist-language=INI gitlab-language=ini
+*.import text eol=lf linguist-language=INI gitlab-language=ini
+*.godot text eol=lf linguist-language=INI gitlab-language=ini
+
+## Xcode - check that these are correct and don't all need to be binary.
+##    Only pbxproj so far needs to be kept as binary as thats how Xcode
+##    handles it even though it is an xml file.
+*.bat text eol=crlf
+# (binary is a macro for -text -diff)
+*.pbxproj binary
+*.plist text eol=lf
+*.xcworkspacedata text eol=lf
+*.strings text eol=lf
+*.m eol=lf
+*.mm text eol=lf
+*.xib text eol=lf
+
+# Declare files that will always have CRLF line endings on checkout.
+
+## Visual Studio and Windows known common files convert from LF to CRLF to avoid
+##    Visual Studio warnings.
+*.sln text eol=crlf
+*.vcxproj text eol=crlf
+*.vcxproj.filters text eol=crlf
+*.csproj text eol=crlf
+*.rex text eol=crlf
+*.xaml text eol=crlf
+*.appmanifest eol=crlf
+*.manifest eol=crlf
+### Assuming that pfx is a securty key and shouldn't be messed with.
+*.pfx binary
+
+*.vsix filter=lfs diff=lfs merge=lfs -text
+
+###########
+# git-lfs #
+###########
+
+# Archives and/or Compressed Archives
+*.zip filter=lfs diff=lfs merge=lfs -text
+*.tar filter=lfs diff=lfs merge=lfs -text
+*.tar.brz2 filter=lfs diff=lfs merge=lfs -text
+*.tb2 filter=lfs diff=lfs merge=lfs -text
+*.tbz filter=lfs diff=lfs merge=lfs -text
+*.tbz2 filter=lfs diff=lfs merge=lfs -text
+*.tar.gz filter=lfs diff=lfs merge=lfs -text
+*.tgz filter=lfs diff=lfs merge=lfs -text
+*.tar.lz filter=lfs diff=lfs merge=lfs -text
+*.tar.lzma filter=lfs diff=lfs merge=lfs -text
+*.tlz filter=lfs diff=lfs merge=lfs -text
+*.tar.xz filter=lfs diff=lfs merge=lfs -text
+*.txz filter=lfs diff=lfs merge=lfs -text
+*.tar.Z filter=lfs diff=lfs merge=lfs -text
+*.tZ filter=lfs diff=lfs merge=lfs -text
+*.iso filter=lfs diff=lfs merge=lfs -text
+*.cab filter=lfs diff=lfs merge=lfs -text
+
+# Generic Datas
+*.bin filter=lfs diff=lfs merge=lfs -text
+*.dat filter=lfs diff=lfs merge=lfs -text
+
+# Code Binaries
+*.dll filter=lfs diff=lfs merge=lfs -text
+*.lib filter=lfs diff=lfs merge=lfs -text
+*.exp filter=lfs diff=lfs merge=lfs -text
+*.a filter=lfs diff=lfs merge=lfs -text
+*.so filter=lfs diff=lfs merge=lfs -text
+*.dylib filter=lfs diff=lfs merge=lfs -text
+*.pdb filter=lfs diff=lfs merge=lfs -text
+glslangValidator filter=lfs diff=lfs merge=lfs -text
+
+# Program Executables / Setups
+*.app filter=lfs diff=lfs merge=lfs -text
+*.exe filter=lfs diff=lfs merge=lfs -text
+*.msi filter=lfs diff=lfs merge=lfs -text
+*.dmg filter=lfs diff=lfs merge=lfs -text
+*.pkg filter=lfs diff=lfs merge=lfs -text
+*.jar filter=lfs diff=lfs merge=lfs -text
+
+# Documents
+*.pdf filter=lfs diff=lfs merge=lfs -text
+*.odt filter=lfs diff=lfs merge=lfs -text
+*.odm filter=lfs diff=lfs merge=lfs -text
+*.doc filter=lfs diff=lfs merge=lfs -text
+*.docx filter=lfs diff=lfs merge=lfs -text
+*.ods filter=lfs diff=lfs merge=lfs -text
+*.xls filter=lfs diff=lfs merge=lfs -text
+*.xlsx filter=lfs diff=lfs merge=lfs -text
+*.odp filter=lfs diff=lfs merge=lfs -text
+*.ppt filter=lfs diff=lfs merge=lfs -text
+*.pptx filter=lfs diff=lfs merge=lfs -text
+*.odg filter=lfs diff=lfs merge=lfs -text
+*.odc filter=lfs diff=lfs merge=lfs -text
+
+# Images
+*.bmp filter=lfs diff=lfs merge=lfs -text
+*.exr filter=lfs diff=lfs merge=lfs -text
+*.hdr filter=lfs diff=lfs merge=lfs -text
+*.gif filter=lfs diff=lfs merge=lfs -text
+*.iff filter=lfs diff=lfs merge=lfs -text
+*.jpeg filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.pict filter=lfs diff=lfs merge=lfs -text
+*.png filter=lfs diff=lfs merge=lfs -text
+*.tga filter=lfs diff=lfs merge=lfs -text
+*.tif filter=lfs diff=lfs merge=lfs -text
+*.tiff filter=lfs diff=lfs merge=lfs -text
+*.ico filter=lfs diff=lfs merge=lfs -text
+*.ppm filter=lfs diff=lfs merge=lfs -text
+
+# Graphics Editor Format
+*.eps filter=lfs diff=lfs merge=lfs -text
+*.psd filter=lfs diff=lfs merge=lfs -text
+*.ai filter=lfs diff=lfs merge=lfs -text
+*.afdesign filter=lfs diff=lfs merge=lfs -text
+*.afphoto filter=lfs diff=lfs merge=lfs -text
+*.ase filter=lfs diff=lfs merge=lfs -text
+*.aseprite filter=lfs diff=lfs merge=lfs -text
+*.ssae filter=lfs diff=lfs merge=lfs -text
+*.xcf filter=lfs diff=lfs merge=lfs -text
+
+# Audio
+*.aif filter=lfs diff=lfs merge=lfs -text
+*.aiff filter=lfs diff=lfs merge=lfs -text
+*.it filter=lfs diff=lfs merge=lfs -text
+*.mod filter=lfs diff=lfs merge=lfs -text
+*.mp3 filter=lfs diff=lfs merge=lfs -text
+*.ogg filter=lfs diff=lfs merge=lfs -text
+*.s3m filter=lfs diff=lfs merge=lfs -text
+*.wav filter=lfs diff=lfs merge=lfs -text
+*.xm filter=lfs diff=lfs merge=lfs -text
+*.flac filter=lfs diff=lfs merge=lfs -text
+*.wma filter=lfs diff=lfs merge=lfs -text
+
+# Videos
+*.avi filter=lfs diff=lfs merge=lfs -text
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+*.m4p filter=lfs diff=lfs merge=lfs -text
+*.m4v filter=lfs diff=lfs merge=lfs -text
+*.mpg filter=lfs diff=lfs merge=lfs -text
+*.mp2 filter=lfs diff=lfs merge=lfs -text
+*.mpeg filter=lfs diff=lfs merge=lfs -text
+*.mpe filter=lfs diff=lfs merge=lfs -text
+*.mpv filter=lfs diff=lfs merge=lfs -text
+*.ts filter=lfs diff=lfs merge=lfs -text
+*.mov filter=lfs diff=lfs merge=lfs -text
+*.qt filter=lfs diff=lfs merge=lfs -text
+*.webm filter=lfs diff=lfs merge=lfs -text
+
+# 3D Models
+*.3dm filter=lfs diff=lfs merge=lfs -text
+*.3ds filter=lfs diff=lfs merge=lfs -text
+*.blend filter=lfs diff=lfs merge=lfs -text
+*.c4d filter=lfs diff=lfs merge=lfs -text
+*.collada filter=lfs diff=lfs merge=lfs -text
+*.dae filter=lfs diff=lfs merge=lfs -text
+*.dxf filter=lfs diff=lfs merge=lfs -text
+*.fbx filter=lfs diff=lfs merge=lfs -text
+*.jas filter=lfs diff=lfs merge=lfs -text
+*.lws filter=lfs diff=lfs merge=lfs -text
+*.lxo filter=lfs diff=lfs merge=lfs -text
+*.ma filter=lfs diff=lfs merge=lfs -text
+*.max filter=lfs diff=lfs merge=lfs -text
+*.mb filter=lfs diff=lfs merge=lfs -text
+*.obj filter=lfs diff=lfs merge=lfs -text
+*.ply filter=lfs diff=lfs merge=lfs -text
+*.skp filter=lfs diff=lfs merge=lfs -text
+*.stl filter=lfs diff=lfs merge=lfs -text
+*.ztl filter=lfs diff=lfs merge=lfs -text
+
+# 3D Model - Animations
+*.anim filter=lfs diff=lfs merge=lfs -text
+
+# 3D Model - Godot Internal / Imported
+*.material filter=lfs diff=lfs merge=lfs -text
+*.mesh filter=lfs diff=lfs merge=lfs -text
+*.meshlib filter=lfs diff=lfs merge=lfs -text
+
+# Godot
+*.res filter=lfs diff=lfs merge=lfs -text
+*.scn filter=lfs diff=lfs merge=lfs -text
+*.theme filter=lfs diff=lfs merge=lfs -text
+*.translation filter=lfs diff=lfs merge=lfs -text
+
+# Fonts
+*.otf filter=lfs diff=lfs merge=lfs -text
+*.woff filter=lfs diff=lfs merge=lfs -text
+*.woff2 filter=lfs diff=lfs merge=lfs -text
+*.eot filter=lfs diff=lfs merge=lfs -text
+*.ttf filter=lfs diff=lfs merge=lfs -text
+
+# World Machine
+*.tmd filter=lfs diff=lfs merge=lfs -text
