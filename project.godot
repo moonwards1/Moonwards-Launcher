@@ -16,15 +16,12 @@ _global_script_class_icons={
 [application]
 
 config/name="moonwards-launcher"
+run/main_scene="res://Launcher.tscn"
 config/icon="res://icon.png"
 
 [display]
 
-window/size/width=768
-window/size/height=768
 window/size/resizable=false
-window/size/test_width=768
-window/size/test_height=768
 window/energy_saving/keep_screen_on=false
 window/stretch/mode="2d"
 window/stretch/aspect="expand"
@@ -48,7 +45,7 @@ quality/2d/use_pixel_snap=true
 quality/shadows/filter_mode=0
 quality/reflections/texture_array_reflections=false
 quality/reflections/high_quality_ggx=false
-quality/subsurface_scattering/quality=0
-quality/voxel_cone_tracing/high_quality=false
 quality/depth/hdr=false
 environment/default_environment="res://default_env.tres"
+quality/subsurface_scattering/quality=0
+quality/voxel_cone_tracing/high_quality=false
