@@ -23,6 +23,7 @@ onready var update_launcher_button = $HBoxContainer/VBoxContainer/UpdateLauncher
 
 var server_url : String = "http://107.173.129.154/moonwards/"
 var download_queue : Array = []
+var md5_queue : Array = []
 var downloads_done : Array = []
 var file : File = File.new()
 var directory : Directory = Directory.new()
@@ -42,8 +43,8 @@ func _ready() -> void:
 	_check_for_launcher_updates()
 
 func _check_for_launcher_updates() -> void:
-	http_request.connect("request_completed", self, "_receive_md5_json")
-	var error = http_request.request(server_url + "launcher_md5.json")
+	http_request.connect("request_completed", self, "_receive_files_json")
+	var error = http_request.request(server_url + "launcher_files.json")
 	
 	update_state = UPDATE_STATE.LAUNCHER
 	update_state_name = "launcher"
@@ -52,7 +53,7 @@ func _check_for_launcher_updates() -> void:
 		_set_status("Error getting launcher updates.")
 		return
 
-func _receive_md5_json(result : int, response_code : int, headers : PoolStringArray, body : PoolByteArray) -> void:
+func _receive_files_json(result : int, response_code : int, headers : PoolStringArray, body : PoolByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS:
 		_set_status("Error, could not fetch " + update_state_name + " launcher updates.")
 		_log("Error status " + str(result))
@@ -80,17 +81,59 @@ func _receive_md5_json(result : int, response_code : int, headers : PoolStringAr
 		_set_status("Platform not supported.")
 		return
 	
-	for file_data in files:
-		var file_name = file_data["file"]
-		var file_md5 = file_data["md5"]
+	for file_name in files:
+		md5_queue.append({"file_name" : file_name, "path" : path})
+	
+	http_request.disconnect("request_completed", self, "_receive_files_json")
+
+	_get_next_md5()
+
+func _get_next_md5() -> void:
+	if md5_queue.size() != 0:
+		http_request.connect("request_completed", self, "_receive_md5")
+		
+		var error = http_request.request(server_url + md5_queue[0].path + md5_queue[0].file_name + ".md5")
+		if error != OK:
+			_set_status("Error")
+			_log("Error " + str(error) + " requesting update " + server_url + md5_queue[0].path + md5_queue[0].file_name + ".md5")
+	else:
+		if download_queue.size() != 0:
+			if update_state == UPDATE_STATE.LAUNCHER:
+				_set_status("Launcher Updates Available")
+				update_launcher_button.show()
+			elif update_state == UPDATE_STATE.MOONWARDS:
+				_set_status("Moonwards Updates Available")
+				update_moonwards_button.show()
+		else:
+			if update_state == UPDATE_STATE.LAUNCHER:
+				_log("No launcher updates available.")
+				_check_for_moonwards_updates()
+			elif update_state == UPDATE_STATE.MOONWARDS:
+				_log("No Moonwards updates available.")
+				launch_button.show()
+
+func _receive_md5(result : int, response_code : int, headers : PoolStringArray, body : PoolByteArray) -> void:
+	if result != HTTPRequest.RESULT_SUCCESS:
+		_log("An error occured getting the MD5.")
+		_get_next_md5()
+		return
+	
+	if response_code != HTTPClient.RESPONSE_OK:
+		_set_status("Error getting MD5.")
+		_log("Received response code " + str(response_code) + ".")
+	else:
+		var file_md5 = body.get_string_from_utf8().rstrip("\n")
+		var file_name = md5_queue[0].file_name
+		var path = md5_queue[0].path
 		
 		_log("File : " + file_name + " md5: " + file_md5)
+		
 		var write_dir
 		if update_state == UPDATE_STATE.LAUNCHER:
 			write_dir = "res://"
 		elif update_state == UPDATE_STATE.MOONWARDS:
 			write_dir = "user://"
-		
+
 		if directory.file_exists(write_dir + file_name):
 			var local_md5 = file.get_md5(write_dir + file_name)
 			_log("Local md5: " + local_md5)
@@ -100,24 +143,14 @@ func _receive_md5_json(result : int, response_code : int, headers : PoolStringAr
 			_log("File : " + file_name + " does not exist")
 			download_queue.append({"file_name" : file_name, "path" : path})
 	
-	http_request.disconnect("request_completed", self, "_receive_md5_json")
+	http_request.disconnect("request_completed", self, "_receive_md5")
 	
-	if download_queue.size() != 0:
-		if update_state == UPDATE_STATE.LAUNCHER:
-			_set_status("Launcher Updates Available")
-			update_launcher_button.show()
-		elif update_state == UPDATE_STATE.MOONWARDS:
-			_set_status("Moonwards Updates Available")
-			update_moonwards_button.show()
-	else:
-		if update_state == UPDATE_STATE.LAUNCHER:
-			_check_for_moonwards_updates()
-		elif update_state == UPDATE_STATE.MOONWARDS:
-			launch_button.show()
+	md5_queue.remove(0)
+	_get_next_md5()
 
 func _check_for_moonwards_updates() -> void:
-	http_request.connect("request_completed", self, "_receive_md5_json")
-	var error = http_request.request(server_url + "moonwards_md5.json")
+	http_request.connect("request_completed", self, "_receive_files_json")
+	var error = http_request.request(server_url + "moonwards_files.json")
 	
 	update_state = UPDATE_STATE.MOONWARDS
 	update_state_name = "Moonwards"
@@ -150,10 +183,9 @@ func _platform_check() -> void:
 func _log(text : String) -> void:
 	emit_signal("receive_update_message", text)
 	text_log.text += text + "\n"
+	print(text)
 
 func _receive_file(result : int, response_code : int, headers : PoolStringArray, body : PoolByteArray) -> void:
-	_log("Result : " + str(response_code) + ".")
-	
 	if result != HTTPRequest.RESULT_SUCCESS:
 		_log("An error occured getting an update.")
 		_get_next_update()
@@ -173,6 +205,8 @@ func _receive_file(result : int, response_code : int, headers : PoolStringArray,
 		file.store_buffer(body)
 		file.close()
 		_log("Done writing " + write_dir)
+	
+	http_request.disconnect("request_completed", self, "_receive_file")
 	
 	downloads_done.append(download_queue[0])
 	download_queue.remove(0)
@@ -201,7 +235,7 @@ func _restart_launcher() -> void:
 	var pid
 	
 	if platform == PLATFORMS.LINUX:
-		pid = OS.execute("./Moonwards-Launcher.x86_64", [], false, output)
+		pid = OS.execute('/bin/sh', ["-c", "chmod +x Moonwards-Launcher.x86_64 && ./Moonwards-Launcher.x86_64"], false, output)
 	elif platform == PLATFORMS.OSX:
 		pid = OS.execute("./Moonwards-Launcher.app", [], false, output)
 	elif platform == PLATFORMS.WINDOWS:
@@ -221,7 +255,8 @@ func _launch_moonwards() -> void:
 	var pid
 	
 	if platform == PLATFORMS.LINUX:
-		pid = OS.execute('/bin/sh', ["-c", "cd " + OS.get_user_data_dir() + " && ./MoonTown.x86_64"], false, output)
+		var user_data_dir = OS.get_user_data_dir().replace(" ", "\\ ")
+		pid = OS.execute('/bin/sh', ["-c", "cd " + user_data_dir + " && chmod +x MoonTown.x86_64 && ./MoonTown.x86_64"], false, output)
 	elif platform == PLATFORMS.OSX:
 		pid = OS.execute('/bin/sh', ["-c", "cd " + OS.get_user_data_dir() + " && ./MoonTown.app"], false, output)
 	elif platform == PLATFORMS.WINDOWS:

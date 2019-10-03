@@ -15,7 +15,7 @@ _global_script_class_icons={
 
 [application]
 
-config/name="moonwards-launcher"
+config/name="Moonwards Launcher"
 run/main_scene="res://Launcher.tscn"
 config/icon="res://icon.png"
 
