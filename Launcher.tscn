@@ -43,26 +43,34 @@ margin_bottom = 600.0
 alignment = 1
 
 [node name="Status" type="Label" parent="HBoxContainer/VBoxContainer"]
-margin_top = 246.0
+margin_top = 231.0
 margin_right = 100.0
-margin_bottom = 296.0
+margin_bottom = 281.0
 rect_min_size = Vector2( 0, 50 )
 text = "Status"
 align = 1
 valign = 1
 
 [node name="LaunchButton" type="Button" parent="HBoxContainer/VBoxContainer"]
-margin_top = 300.0
+margin_top = 285.0
 margin_right = 100.0
-margin_bottom = 325.0
+margin_bottom = 310.0
 rect_min_size = Vector2( 100, 25 )
 text = "Launch"
 
-[node name="UpdateButton" type="Button" parent="HBoxContainer/VBoxContainer"]
-margin_top = 329.0
+[node name="UpdateMoonwardsButton" type="Button" parent="HBoxContainer/VBoxContainer"]
+margin_top = 314.0
 margin_right = 100.0
-margin_bottom = 354.0
+margin_bottom = 339.0
+rect_min_size = Vector2( 100, 25 )
+text = "Update"
+
+[node name="UpdateLauncherButton" type="Button" parent="HBoxContainer/VBoxContainer"]
+margin_top = 343.0
+margin_right = 100.0
+margin_bottom = 368.0
 rect_min_size = Vector2( 100, 25 )
 text = "Update"
 [connection signal="pressed" from="HBoxContainer/VBoxContainer/LaunchButton" to="." method="_launch_moonwards"]
-[connection signal="pressed" from="HBoxContainer/VBoxContainer/UpdateButton" to="." method="_start_update"]
+[connection signal="pressed" from="HBoxContainer/VBoxContainer/UpdateMoonwardsButton" to="." method="_update_moonwards"]
+[connection signal="pressed" from="HBoxContainer/VBoxContainer/UpdateLauncherButton" to="." method="_update_launcher"]
