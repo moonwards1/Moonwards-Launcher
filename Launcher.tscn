@@ -1,0 +1,76 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Themes/Main.tres" type="Theme" id=1]
+[ext_resource path="res://launcher.gd" type="Script" id=2]
+[ext_resource path="res://Images/TeacupSurface_1067.jpg" type="Texture" id=3]
+
+[node name="Control" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource( 1 )
+script = ExtResource( 2 )
+
+[node name="Background" type="TextureRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource( 3 )
+expand = true
+stretch_mode = 7
+
+[node name="TextLog" type="TextEdit" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+readonly = true
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+use_threads = true
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -14.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+margin_left = 462.0
+margin_right = 562.0
+margin_bottom = 600.0
+alignment = 1
+
+[node name="Status" type="Label" parent="HBoxContainer/VBoxContainer"]
+margin_top = 231.0
+margin_right = 100.0
+margin_bottom = 281.0
+rect_min_size = Vector2( 0, 50 )
+text = "Status"
+align = 1
+valign = 1
+
+[node name="LaunchButton" type="Button" parent="HBoxContainer/VBoxContainer"]
+margin_top = 285.0
+margin_right = 100.0
+margin_bottom = 310.0
+rect_min_size = Vector2( 100, 25 )
+text = "Launch"
+
+[node name="UpdateMoonwardsButton" type="Button" parent="HBoxContainer/VBoxContainer"]
+margin_top = 314.0
+margin_right = 100.0
+margin_bottom = 339.0
+rect_min_size = Vector2( 100, 25 )
+text = "Update"
+
+[node name="UpdateLauncherButton" type="Button" parent="HBoxContainer/VBoxContainer"]
+margin_top = 343.0
+margin_right = 100.0
+margin_bottom = 368.0
+rect_min_size = Vector2( 100, 25 )
+text = "Update"
+[connection signal="pressed" from="HBoxContainer/VBoxContainer/LaunchButton" to="." method="_launch_moonwards"]
+[connection signal="pressed" from="HBoxContainer/VBoxContainer/UpdateMoonwardsButton" to="." method="_update_moonwards"]
+[connection signal="pressed" from="HBoxContainer/VBoxContainer/UpdateLauncherButton" to="." method="_update_launcher"]
