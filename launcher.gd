@@ -34,6 +34,7 @@ var update_state_name : String = "NA"
 signal receive_update_message
 
 func _ready() -> void:
+	http_request.use_threads = true
 	launch_button.hide()
 	update_moonwards_button.hide()
 	update_launcher_button.hide()
