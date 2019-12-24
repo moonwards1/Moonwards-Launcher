@@ -21,7 +21,7 @@ onready var launch_button = $HBoxContainer/VBoxContainer/LaunchButton
 onready var update_moonwards_button = $HBoxContainer/VBoxContainer/UpdateMoonwardsButton
 onready var update_launcher_button = $HBoxContainer/VBoxContainer/UpdateLauncherButton
 
-var server_url : String = "http://107.173.129.154/moonwards/"
+var server_url : String = "http://launcher.moonwards.com/moonwards/"
 var download_queue : Array = []
 var md5_queue : Array = []
 var downloads_done : Array = []
@@ -34,6 +34,7 @@ var update_state_name : String = "NA"
 signal receive_update_message
 
 func _ready() -> void:
+	http_request.use_threads = true
 	launch_button.hide()
 	update_moonwards_button.hide()
 	update_launcher_button.hide()
@@ -55,7 +56,7 @@ func _check_for_launcher_updates() -> void:
 
 func _receive_files_json(result : int, response_code : int, headers : PoolStringArray, body : PoolByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS:
-		_set_status("Error, could not fetch " + update_state_name + " launcher updates.")
+		_set_status("Error, could not fetch " + update_state_name + " updates.")
 		_log("Error status " + str(result))
 		return
 	
