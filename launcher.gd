@@ -21,7 +21,7 @@ onready var launch_button = $HBoxContainer/VBoxContainer/LaunchButton
 onready var update_moonwards_button = $HBoxContainer/VBoxContainer/UpdateMoonwardsButton
 onready var update_launcher_button = $HBoxContainer/VBoxContainer/UpdateLauncherButton
 
-var server_url : String = "http://launcher.moonwards.com/moonwards/"
+var server_url : String = "http://launcher.moonwards.com/"
 var download_queue : Array = []
 var md5_queue : Array = []
 var downloads_done : Array = []
@@ -151,7 +151,7 @@ func _receive_md5(result : int, response_code : int, headers : PoolStringArray, 
 
 func _check_for_moonwards_updates() -> void:
 	http_request.connect("request_completed", self, "_receive_files_json")
-	var error = http_request.request(server_url + "moonwards_files.json")
+	var error = http_request.request(server_url + "moonwards/moonwards_files.json")
 	
 	update_state = UPDATE_STATE.MOONWARDS
 	update_state_name = "Moonwards"
