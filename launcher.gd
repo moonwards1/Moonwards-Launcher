@@ -242,15 +242,17 @@ func _restart_launcher() -> void:
 	if platform == PLATFORMS.LINUX:
 		pid = OS.execute('/bin/sh', ["-c", "chmod +x Moonwards-Launcher.x86_64 && ./Moonwards-Launcher.x86_64"], false, output)
 	elif platform == PLATFORMS.OSX:
-		OS.execute("unzip", ["-o", "Moonwards-Launcher.zip"], true)
-		pid = OS.execute("open", ["-a", "Moonwards\\ Launcher.app"], false, output)
+		OS.execute("unzip", ["-o", "Moonwards-Launcher.zip"], true, output)
+		OS.execute("chmod", ["+x", "Moonwards-Launcher.app/Contents/MacOS/Moonwards-Launcher"], true, output)
+		pid = OS.execute("open", ["-a", "Moonwards-Launcher.app"], false, output)
 	elif platform == PLATFORMS.WINDOWS:
 		pid = OS.execute("./Moonwards-Launcher.exe", [], false, output)
 	
 	if pid == -1:
 		_set_status("Error executing " + update_state_name + " : " + str(pid))
 	else:
-		get_tree().quit()
+#		get_tree().quit()
+		pass
 
 func _set_status(text : String) -> void:
 	_log(text)
