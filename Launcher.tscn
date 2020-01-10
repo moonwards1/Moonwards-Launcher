@@ -18,6 +18,7 @@ expand = true
 stretch_mode = 7
 
 [node name="TextLog" type="TextEdit" parent="."]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 readonly = true

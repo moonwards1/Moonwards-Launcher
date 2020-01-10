@@ -33,6 +33,10 @@ var update_state_name : String = "NA"
 
 signal receive_update_message
 
+func _input(event):
+	if event.is_action_pressed("toggle_log"):
+		text_log.visible = !text_log.visible
+
 func _ready() -> void:
 	http_request.use_threads = true
 	launch_button.hide()
