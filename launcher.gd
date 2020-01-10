@@ -112,10 +112,10 @@ func _get_next_md5() -> void:
 				update_moonwards_button.show()
 		else:
 			if update_state == UPDATE_STATE.LAUNCHER:
-				_log("No launcher updates available.")
+				_set_status("No launcher updates available.")
 				_check_for_moonwards_updates()
 			elif update_state == UPDATE_STATE.MOONWARDS:
-				_log("No Moonwards updates available.")
+				_set_status("No Moonwards updates available.")
 				launch_button.show()
 
 func _receive_md5(result : int, response_code : int, headers : PoolStringArray, body : PoolByteArray) -> void:
@@ -230,10 +230,23 @@ func _get_next_update() -> void:
 			_set_status("Error")
 			_log("Error " + str(error) + " requesting update " + server_url + download_queue[0].path + download_queue[0].file_name)
 	else:
+		var output = []
 		if update_state == UPDATE_STATE.LAUNCHER:
+			if platform == PLATFORMS.OSX:
+				OS.execute("unzip", ["-o", "Moonwards-Launcher.zip"], true, output)
+				OS.execute('/bin/sh', ["-c", "chmod +x Moonwards-Launcher.app/Contents/MacOS/Moonwards-Launcher"], true, output)
+				for line in output:
+					_log(line)
 			_restart_launcher()
 		elif update_state == UPDATE_STATE.MOONWARDS:
 			_set_status("Update done")
+			if platform == PLATFORMS.OSX:
+				var user_data_dir = OS.get_user_data_dir().replace(" ", "\\ ")
+				OS.execute("unzip", ["-o", OS.get_user_data_dir() + "/MoonTown.zip", "-d", OS.get_user_data_dir()], true, output)
+				var command = "cd " + user_data_dir + " && chmod +x CernansPromise.app/Contents/MacOS/CernansPromise"
+				OS.execute('/bin/sh', ["-c", command], true, output)
+				for line in output:
+					_log(line)
 			launch_button.show()
 
 func _restart_launcher() -> void:
@@ -243,13 +256,12 @@ func _restart_launcher() -> void:
 	if platform == PLATFORMS.LINUX:
 		pid = OS.execute('/bin/sh', ["-c", "chmod +x Moonwards-Launcher.x86_64 && ./Moonwards-Launcher.x86_64"], false, output)
 	elif platform == PLATFORMS.OSX:
-		OS.execute("unzip", ["-o", "Moonwards-Launcher.zip"], true, output)
-		OS.execute('/bin/sh', ["-c", "chmod +x Moonwards-Launcher.app/Contents/MacOS/Moonwards-Launcher"], true, output)
-		for line in output:
-			_log(line)
 		pid = OS.execute('open', ["-a", "Moonwards-Launcher.app"], false, output)
 	elif platform == PLATFORMS.WINDOWS:
 		pid = OS.execute("./Moonwards-Launcher.exe", [], false, output)
+	
+	for line in output:
+		_log(line)
 	
 	if pid == -1:
 		_set_status("Error executing " + update_state_name + " : " + str(pid))
@@ -268,13 +280,12 @@ func _launch_moonwards() -> void:
 		var user_data_dir = OS.get_user_data_dir().replace(" ", "\\ ")
 		pid = OS.execute('/bin/sh', ["-c", "cd " + user_data_dir + " && chmod +x MoonTown.x86_64 && ./MoonTown.x86_64"], false, output)
 	elif platform == PLATFORMS.OSX:
-		OS.execute("unzip", ["-o", OS.get_user_data_dir() + "/MoonTown.zip", "-d", OS.get_user_data_dir()], true, output)
-		OS.execute('/bin/sh', ["-c", "chmod +x \"" + OS.get_user_data_dir() + "/CernansPromise.app/Contents/MacOS/CernansPromise\""], true, output)
-		for line in output:
-			_log(line)
 		pid = OS.execute('open', ["-a", OS.get_user_data_dir() + "/CernansPromise.app"], false, output)
 	elif platform == PLATFORMS.WINDOWS:
 		pid = OS.execute('CMD.exe', ["/C", "cd " + OS.get_user_data_dir() + " && ./MoonTown.exe"], false, output)
+	
+	for line in output:
+		_log(line)
 	
 	if pid == -1:
 		_set_status("Error launching Moonwards : " + str(pid))
