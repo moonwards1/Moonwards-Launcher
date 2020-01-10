@@ -243,8 +243,7 @@ func _restart_launcher() -> void:
 		pid = OS.execute('/bin/sh', ["-c", "chmod +x Moonwards-Launcher.x86_64 && ./Moonwards-Launcher.x86_64"], false, output)
 	elif platform == PLATFORMS.OSX:
 		OS.execute("unzip", ["-o", "Moonwards-Launcher.zip"], true, output)
-		OS.execute("chmod", ["+x", "Moonwards-Launcher.app/Contents/MacOS/Moonwards-Launcher"], true, output)
-		pid = OS.execute("open", ["-a", "Moonwards-Launcher.app"], false, output)
+		pid = OS.execute('/bin/sh', ["-c", "chmod +x Moonwards-Launcher.app/Contents/MacOS/Moonwards-Launcher && open -a Moonwards-Launcher.app"], false, output)
 	elif platform == PLATFORMS.WINDOWS:
 		pid = OS.execute("./Moonwards-Launcher.exe", [], false, output)
 	
