@@ -242,7 +242,8 @@ func _restart_launcher() -> void:
 	if platform == PLATFORMS.LINUX:
 		pid = OS.execute('/bin/sh', ["-c", "chmod +x Moonwards-Launcher.x86_64 && ./Moonwards-Launcher.x86_64"], false, output)
 	elif platform == PLATFORMS.OSX:
-		pid = OS.execute("./Moonwards-Launcher.app", [], false, output)
+		OS.execute("unzip", ["-o", "Moonwards-Launcher.zip"], true)
+		pid = OS.execute("open", ["-a", "Moonwards\\ Launcher.app"], false, output)
 	elif platform == PLATFORMS.WINDOWS:
 		pid = OS.execute("./Moonwards-Launcher.exe", [], false, output)
 	
@@ -263,7 +264,8 @@ func _launch_moonwards() -> void:
 		var user_data_dir = OS.get_user_data_dir().replace(" ", "\\ ")
 		pid = OS.execute('/bin/sh', ["-c", "cd " + user_data_dir + " && chmod +x MoonTown.x86_64 && ./MoonTown.x86_64"], false, output)
 	elif platform == PLATFORMS.OSX:
-		pid = OS.execute('/bin/sh', ["-c", "cd " + OS.get_user_data_dir() + " && ./MoonTown.app"], false, output)
+		OS.execute("unzip", ["-o", "MoonTown.zip"], true)
+		pid = OS.execute('open', ["-a", OS.get_user_data_dir() + "/MoonTown.app"], false, output)
 	elif platform == PLATFORMS.WINDOWS:
 		pid = OS.execute('CMD.exe', ["/C", "cd " + OS.get_user_data_dir() + " && ./MoonTown.exe"], false, output)
 	
