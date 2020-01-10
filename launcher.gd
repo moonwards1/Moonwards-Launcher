@@ -15,7 +15,7 @@ enum UPDATE_STATE{
 
 onready var http_request : HTTPRequest = $HTTPRequest
 onready var text_log = $TextLog
-onready var progress_bar = $ProgressBar
+onready var progress_bar = $VBoxContainer/ProgressBar
 onready var status = $HBoxContainer/VBoxContainer/Status
 onready var launch_button = $HBoxContainer/VBoxContainer/LaunchButton
 onready var update_moonwards_button = $HBoxContainer/VBoxContainer/UpdateMoonwardsButton
