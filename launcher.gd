@@ -175,7 +175,7 @@ func _process(delta : float) -> void:
 		var percent_done = downloads_done.size() * percent_per_download
 		
 		var new_value = percent_done + (percent_per_download * (percent_current_file / 100.0))
-		progress_bar.value = new_value
+		progress_bar.value = new_value + 1.0
 
 func _platform_check() -> void:
 	var platform_name = OS.get_name()
