@@ -20,6 +20,7 @@ onready var status = $HBoxContainer/VBoxContainer/Status
 onready var launch_button = $HBoxContainer/VBoxContainer/LaunchButton
 onready var update_moonwards_button = $HBoxContainer/VBoxContainer/UpdateMoonwardsButton
 onready var update_launcher_button = $HBoxContainer/VBoxContainer/UpdateLauncherButton
+onready var download_speed = $TextLog/DownloadSpeed
 
 var server_url : String = "http://launcher.moonwards.com/"
 var download_queue : Array = []
@@ -30,6 +31,8 @@ var directory : Directory = Directory.new()
 var platform : int = PLATFORMS.NONE
 var update_state : int = UPDATE_STATE.NONE
 var update_state_name : String = "NA"
+var last_size = 0.0
+var download_speed_timer = 0.001
 
 signal receive_update_message
 
@@ -38,7 +41,6 @@ func _input(event):
 		text_log.visible = !text_log.visible
 
 func _ready() -> void:
-	http_request.use_threads = true
 	launch_button.hide()
 	update_moonwards_button.hide()
 	update_launcher_button.hide()
@@ -47,6 +49,7 @@ func _ready() -> void:
 	
 	_platform_check()
 	_check_for_launcher_updates()
+	http_request.use_threads = true
 
 func _check_for_launcher_updates() -> void:
 	http_request.connect("request_completed", self, "_receive_files_json")
@@ -120,7 +123,7 @@ func _get_next_md5() -> void:
 
 func _receive_md5(result : int, response_code : int, headers : PoolStringArray, body : PoolByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS:
-		_log("An error occured getting the MD5.")
+		_log("An error occured getting the MD5. Code : " + str(result))
 		_get_next_md5()
 		return
 	
@@ -174,6 +177,12 @@ func _process(delta : float) -> void:
 		var percent_per_download = 100.0 / (download_queue.size() + downloads_done.size())
 		var percent_done = downloads_done.size() * percent_per_download
 		
+		download_speed_timer += delta
+		if download_speed_timer > 1.0:
+			download_speed.text = str(stepify(((downloaded_bytes - last_size) / download_speed_timer) / 1024, 0.1)) + " Kbps"
+			last_size = downloaded_bytes
+			download_speed_timer = 0.001
+		
 		var new_value = percent_done + (percent_per_download * (percent_current_file / 100.0))
 		progress_bar.value = new_value + 1.0
 
@@ -193,7 +202,7 @@ func _log(text : String) -> void:
 
 func _receive_file(result : int, response_code : int, headers : PoolStringArray, body : PoolByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS:
-		_log("An error occured getting an update.")
+		_log("An error occured getting an update. Code : " + str(result))
 		_get_next_update()
 		return
 	
