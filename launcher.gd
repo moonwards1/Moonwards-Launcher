@@ -48,8 +48,8 @@ func _ready() -> void:
 	set_process(false)
 	
 	_platform_check()
-	_check_for_launcher_updates()
 	http_request.use_threads = true
+	_check_for_moonwards_updates()
 
 func _check_for_launcher_updates() -> void:
 	http_request.connect("request_completed", self, "_receive_files_json")
