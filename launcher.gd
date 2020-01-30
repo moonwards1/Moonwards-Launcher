@@ -15,13 +15,14 @@ enum UPDATE_STATE{
 
 onready var http_request : HTTPRequest = $HTTPRequest
 onready var text_log = $TextLog
-onready var progress_bar = $ProgressBar
+onready var progress_bar = $VBoxContainer/ProgressBar
 onready var status = $HBoxContainer/VBoxContainer/Status
 onready var launch_button = $HBoxContainer/VBoxContainer/LaunchButton
 onready var update_moonwards_button = $HBoxContainer/VBoxContainer/UpdateMoonwardsButton
 onready var update_launcher_button = $HBoxContainer/VBoxContainer/UpdateLauncherButton
+onready var download_speed = $TextLog/DownloadSpeed
 
-var server_url : String = "http://launcher.moonwards.com/moonwards/"
+var server_url : String = "http://launcher.moonwards.com/"
 var download_queue : Array = []
 var md5_queue : Array = []
 var downloads_done : Array = []
@@ -30,18 +31,25 @@ var directory : Directory = Directory.new()
 var platform : int = PLATFORMS.NONE
 var update_state : int = UPDATE_STATE.NONE
 var update_state_name : String = "NA"
+var last_size = 0.0
+var download_speed_timer = 0.001
 
 signal receive_update_message
 
+func _input(event):
+	if event.is_action_pressed("toggle_log"):
+		text_log.visible = !text_log.visible
+
 func _ready() -> void:
-	http_request.use_threads = true
 	launch_button.hide()
 	update_moonwards_button.hide()
 	update_launcher_button.hide()
+	_set_status("Initialising")
 	set_process(false)
 	
 	_platform_check()
-	_check_for_launcher_updates()
+	http_request.use_threads = true
+	_check_for_moonwards_updates()
 
 func _check_for_launcher_updates() -> void:
 	http_request.connect("request_completed", self, "_receive_files_json")
@@ -107,15 +115,15 @@ func _get_next_md5() -> void:
 				update_moonwards_button.show()
 		else:
 			if update_state == UPDATE_STATE.LAUNCHER:
-				_log("No launcher updates available.")
+				_set_status("No launcher updates available.")
 				_check_for_moonwards_updates()
 			elif update_state == UPDATE_STATE.MOONWARDS:
-				_log("No Moonwards updates available.")
+				_set_status("No Moonwards updates available.")
 				launch_button.show()
 
 func _receive_md5(result : int, response_code : int, headers : PoolStringArray, body : PoolByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS:
-		_log("An error occured getting the MD5.")
+		_log("An error occured getting the MD5. Code : " + str(result))
 		_get_next_md5()
 		return
 	
@@ -151,7 +159,7 @@ func _receive_md5(result : int, response_code : int, headers : PoolStringArray, 
 
 func _check_for_moonwards_updates() -> void:
 	http_request.connect("request_completed", self, "_receive_files_json")
-	var error = http_request.request(server_url + "moonwards_files.json")
+	var error = http_request.request(server_url + "moonwards/moonwards_files.json")
 	
 	update_state = UPDATE_STATE.MOONWARDS
 	update_state_name = "Moonwards"
@@ -169,8 +177,14 @@ func _process(delta : float) -> void:
 		var percent_per_download = 100.0 / (download_queue.size() + downloads_done.size())
 		var percent_done = downloads_done.size() * percent_per_download
 		
+		download_speed_timer += delta
+		if download_speed_timer > 1.0:
+			download_speed.text = str(stepify(((downloaded_bytes - last_size) / download_speed_timer) / 1024, 0.1)) + " Kbps"
+			last_size = downloaded_bytes
+			download_speed_timer = 0.001
+		
 		var new_value = percent_done + (percent_per_download * (percent_current_file / 100.0))
-		progress_bar.value = new_value
+		progress_bar.value = new_value + 1.0
 
 func _platform_check() -> void:
 	var platform_name = OS.get_name()
@@ -188,7 +202,7 @@ func _log(text : String) -> void:
 
 func _receive_file(result : int, response_code : int, headers : PoolStringArray, body : PoolByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS:
-		_log("An error occured getting an update.")
+		_log("An error occured getting an update. Code : " + str(result))
 		_get_next_update()
 		return
 	
@@ -225,10 +239,23 @@ func _get_next_update() -> void:
 			_set_status("Error")
 			_log("Error " + str(error) + " requesting update " + server_url + download_queue[0].path + download_queue[0].file_name)
 	else:
+		var output = []
 		if update_state == UPDATE_STATE.LAUNCHER:
+			if platform == PLATFORMS.OSX:
+				OS.execute("unzip", ["-o", "Moonwards-Launcher.zip"], true, output)
+				OS.execute('/bin/sh', ["-c", "chmod +x Moonwards-Launcher.app/Contents/MacOS/Moonwards-Launcher"], true, output)
+				for line in output:
+					_log(line)
 			_restart_launcher()
 		elif update_state == UPDATE_STATE.MOONWARDS:
 			_set_status("Update done")
+			if platform == PLATFORMS.OSX:
+				var user_data_dir = OS.get_user_data_dir().replace(" ", "\\ ")
+				OS.execute("unzip", ["-o", OS.get_user_data_dir() + "/MoonTown.zip", "-d", OS.get_user_data_dir()], true, output)
+				var command = "cd " + user_data_dir + " && chmod +x CernansPromise.app/Contents/MacOS/CernansPromise"
+				OS.execute('/bin/sh', ["-c", command], true, output)
+				for line in output:
+					_log(line)
 			launch_button.show()
 
 func _restart_launcher() -> void:
@@ -238,9 +265,12 @@ func _restart_launcher() -> void:
 	if platform == PLATFORMS.LINUX:
 		pid = OS.execute('/bin/sh', ["-c", "chmod +x Moonwards-Launcher.x86_64 && ./Moonwards-Launcher.x86_64"], false, output)
 	elif platform == PLATFORMS.OSX:
-		pid = OS.execute("./Moonwards-Launcher.app", [], false, output)
+		pid = OS.execute('open', ["-a", "Moonwards-Launcher.app"], false, output)
 	elif platform == PLATFORMS.WINDOWS:
 		pid = OS.execute("./Moonwards-Launcher.exe", [], false, output)
+	
+	for line in output:
+		_log(line)
 	
 	if pid == -1:
 		_set_status("Error executing " + update_state_name + " : " + str(pid))
@@ -259,9 +289,12 @@ func _launch_moonwards() -> void:
 		var user_data_dir = OS.get_user_data_dir().replace(" ", "\\ ")
 		pid = OS.execute('/bin/sh', ["-c", "cd " + user_data_dir + " && chmod +x MoonTown.x86_64 && ./MoonTown.x86_64"], false, output)
 	elif platform == PLATFORMS.OSX:
-		pid = OS.execute('/bin/sh', ["-c", "cd " + OS.get_user_data_dir() + " && ./MoonTown.app"], false, output)
+		pid = OS.execute('open', ["-a", OS.get_user_data_dir() + "/CernansPromise.app"], false, output)
 	elif platform == PLATFORMS.WINDOWS:
 		pid = OS.execute('CMD.exe', ["/C", "cd " + OS.get_user_data_dir() + " && ./MoonTown.exe"], false, output)
+	
+	for line in output:
+		_log(line)
 	
 	if pid == -1:
 		_set_status("Error launching Moonwards : " + str(pid))
